@@ -1,0 +1,115 @@
+<script src="./support/setup.js"></script>
+<script>
+  requireOnLoaded([
+    "esri/Camera",
+    "esri/core/watchUtils",
+    "esri/layers/SceneLayer",
+    "esri/views/SceneView",
+    "dojo/domReady!"
+  ], function(
+    Camera,
+    watchUtils,
+    SceneLayer,
+    SceneView
+  ) {
+
+    sceneLayer = new SceneLayer({
+      url: "https://tilesqa.arcgis.com/tiles/SdQnSRS214Ul5Jv5/arcgis/rest/services/STM__4326__US_SanFrancisco__Buildings_OBB/SceneServer"
+    });
+
+    view = new SceneView({
+      container: "viewDiv",
+      map: {
+        basemap: "satellite",
+        ground: "world-elevation",
+        layers: [ sceneLayer ]
+      },
+      qualityProfile: "low"
+    });
+
+    view.when(() => {
+      const camera = new Camera({
+        "position": {
+          "spatialReference": {
+            "latestWkid": 3857,
+            "wkid": 102100
+          },
+          "x": -13622944.22508298,
+          "y": 4549998.123227517,
+          "z": 310.1285981759429
+        },
+        "heading": 262.4618845165347,
+        "tilt": 84.65666542235044
+      });
+
+      view.goTo(camera, { animate: false });
+    });
+
+    startDateEpoch = new Date('2020-03-13T17:15:00-08:00').getTime();
+    endDateEpoch = new Date('2020-03-13T19:15:00-08:00').getTime();
+
+    animationDateDelta = 0;
+    animationDirection = 1;
+
+    function animateDate() {
+      viewDateEpoch = view.environment.lighting.date.getTime();
+
+      viewEnvironmentClone = view.environment.clone();
+
+      if (viewDateEpoch < startDateEpoch) {
+        animationDateDelta = 0;
+        animationDirection = 1;
+      } else if (viewDateEpoch > endDateEpoch) {
+        animationDateDelta = endDateEpoch - startDateEpoch;
+        animationDirection = -1;
+      } else {
+        animationDateDelta += 10000 * animationDirection;
+      }
+
+      viewEnvironmentClone.lighting.date = new Date(startDateEpoch + animationDateDelta);
+
+      view.environment= viewEnvironmentClone;
+
+      window.requestAnimationFrame(animateDate);
+    }
+    animateDate();
+
+
+    profileIdx = 0;
+    profiles = ["low", "high"];
+
+    window.play = () => {
+      profileIdx = (profileIdx + 1) % profiles.length;
+      view.qualityProfile = profiles[profileIdx];
+      view.environment.atmosphere.quality = profiles[profileIdx];
+      view.environment.lighting.directShadowsEnabled = profiles[profileIdx] === "high";
+      view.environment.lighting.ambientOcclusion = profiles[profileIdx] === "high";
+    }
+
+    let fpsTimestamp = 0;
+    const fpsMeasurements = new Array(90);
+    let fpsMeasurementsIndex = 0;
+
+    function measureFramesPerSecond() {
+      const now = performance.now()
+      const milisecondsBetweenAnimationFrames = now - fpsTimestamp;
+      fpsTimestamp = now;
+
+      fpsMeasurements[fpsMeasurementsIndex] = Math.round(1000 / milisecondsBetweenAnimationFrames);
+      fpsMeasurementsIndex = (fpsMeasurementsIndex + 1) % fpsMeasurements.length;
+
+      window.requestAnimationFrame(() => measureFramesPerSecond());
+    }
+
+    measureFramesPerSecond();
+
+    function updateLogMessage() {
+      const qualityProfile = view.qualityProfile;
+      const fpsRate = Math.floor(fpsMeasurements.reduce((sum, cur) => (sum + cur), 0) / fpsMeasurements.length);
+      logMessage(`profile: ${qualityProfile}, FPS: ${fpsRate}`);
+    }
+
+    watchUtils.init(view, "environment", updateLogMessage);
+    window.setInterval(updateLogMessage, 1000);
+  });
+</script>

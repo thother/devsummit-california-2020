@@ -1,0 +1,264 @@
+
+html,
+body,
+#viewDiv, #appDiv, #popup {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+table {
+  width: 100%;
+  font-size: small;
+  margin: 0;
+}
+
+table thead {
+  background-color: #DDD;
+}
+
+table tbody td {
+  padding: 0;
+}
+
+table tbody td:first-child {
+  padding-left: 10px;
+}
+
+
+#performanceInfo  {
+  position: absolute;
+
+  top: 40px;
+  right: 40px;
+
+  border: 3px solid #AAA;
+  border-radius: 25px;
+  border-top-color: #FFF;
+  border-left-color: #EEE;
+  border-right-color: #BBB;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  display: table;
+
+  width: 40px;
+  height: 40px;
+
+  font-size: 1.5em;
+  font-weight: 900;
+  -webkit-text-stroke: 1px #333
+}
+
+#performanceInfo.green {
+  background-color: rgba(0, 255, 0, 0.25);
+  color: rgb(0, 255, 0);
+}
+#performanceInfo.yellow {
+  background-color: rgba(255, 255, 0, 0.25);
+  color: rgb(255, 255, 0);
+}
+#performanceInfo.red {
+  background-color: rgba(255, 0, 0, 0.25);
+  color: rgb(255, 0, 0);
+}
+
+#performanceInfo span {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+}
+
+
+#resourceInfo {
+  position: absolute;
+
+  border: 1px solid #AAA;
+  border-radius: 5px;
+  background-color: white;
+  box-shadow: -15px 15px 20px rgba(0, 0, 0, 0.3);
+
+  color: #333;
+
+  padding: 15px;
+
+  width: 250px;
+  height: 250px;
+
+  bottom: 40px;
+  left: 40px;
+}
+
+#resourceInfo .memoryIndicator {
+  border: 1px solid gray;
+  width: 80px;
+}
+
+#resourceInfo .memoryIndicatorValue {
+  background-color: red;
+  height: 10px
+}
+
+
+#resourceGenerator {
+  position: absolute;
+
+  width: 200px;
+  height: 200px;
+
+  bottom: 40px;
+  right: 40px;
+
+  border: 3px solid #AAA;
+  border-radius: 25px;
+  border-top-color: #FFF;
+  border-left-color: #EEE;
+  border-right-color: #BBB;
+  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 15px 15px 20px rgba(0, 0, 0, 0.3);
+
+  overflow: hidden;
+}
+
+#equalizerCanvas {
+  position: absolute;
+  left: 40px;
+  bottom: 41px;
+  width: 280px;
+  height: 80px;
+  background-color: transparent;
+}
+
+
+#resourceController {
+  position: absolute;
+
+  top: 40px;
+  left: 40px;
+}
+
+#resourceController > div  {
+  display: flex;
+  flex-direction: row;
+} 
+
+#resourceController > div div.button:first-child {
+  visibility: visible;
+  margin-left: 0;
+
+  border-top-color: #FFF;
+  border-left-color: #EEE;
+  border-right-color: #BBB;
+  border-bottom-color: #AAA;
+}
+
+#resourceController > div:hover div.button {
+  visibility: visible;
+} 
+
+
+#resourceController > div div.button {
+  visibility: hidden;
+  margin-left: 5px;
+
+  border-top-color: #888;
+  border-left-color: #777;
+  border-right-color: #444;
+  border-bottom-color: #333;
+}
+
+
+
+#resourceController .button {
+  display: block;
+
+  border: 3px solid #AAA;
+  border-radius: 15px;
+  border-top-color: #FFF;
+  border-left-color: #EEE;
+  border-right-color: #BBB;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  width: 50px;
+  height: 50px;
+
+  margin-bottom: 5px;
+}
+
+#resourceController .button:hover {
+  cursor: pointer;
+  background-color: rgba(127, 127, 127, 0.25);
+}
+
+#resourceController .description {
+  display: inline-block;
+  user-select: none;
+  text-align: center;
+  width: 100%;
+
+  font-size: 0.7em;
+  color: #eee;
+}
+
+#resourceController .icon {
+  display: inline-block;
+
+  margin: 5 10px 0 10px;
+
+  width: 30px;
+  height: 30px;
+
+  mask-size: cover;
+  -webkit-mask-size: cover;
+}
+
+#resourceController .icon {
+  background:rgba(255, 200, 0, 0.25);
+}
+
+#resourceController .icon.enabled {
+  background:rgba(255, 200, 0, 0.9);
+}
+
+
+$grid: "%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2220%22%20height=%2220%22%20viewBox=%22-4%20-4%2040%2040%22%20class=%22svg-icon%22%3E%3Cpath%20d=%22M0%200h13.3v13.3H0V0zm18.7%200H32v13.3H18.7V0zM0%2018.7h13.3V32H0V18.7zm18.7%200H32V32H18.7V18.7z%22/%3E%3C/svg%3E";
+#resourceController .icon-feature {
+  mask-image: url("data:image/svg+xml, #{$grid}");
+  -webkit-mask-image: url("data:image/svg+xml, #{$grid}");
+}
+
+$city: "%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22128%22%20height=%22128%22%20viewBox=%220%200%20128%20128%22%3E%3Cg%20stroke=%22black%22%20stroke-width=%226%22%3E%3Cpath%20d=%22M22.5,123.5%20L22.5,23.5%22/%3E%3Cpath%20d=%22M67.5,123.5%20L67.5,23.5%22/%3E%3Cpath%20d=%22M22.5,23.5%20L67.5,23.5%22/%3E%3Crect%20width=%226%22%20height=%228%22%20x=%2235%22%20y=%2236%22/%3E%3Crect%20width=%226%22%20height=%228%22%20x=%2250%22%20y=%2236%22/%3E%3Crect%20width=%226%22%20height=%228%22%20x=%2235%22%20y=%2252%22/%3E%3Crect%20width=%226%22%20height=%228%22%20x=%2250%22%20y=%2252%22/%3E%3Crect%20width=%226%22%20height=%228%22%20x=%2235%22%20y=%2268%22/%3E%3Crect%20width=%226%22%20height=%228%22%20x=%2250%22%20y=%2268%22/%3E%3Crect%20width=%226%22%20height=%228%22%20x=%2235%22%20y=%2284%22/%3E%3Crect%20width=%226%22%20height=%228%22%20x=%2250%22%20y=%2284%22/%3E%3Crect%20width=%2212%22%20height=%2215%22%20x=%2239%22%20y=%22105%22/%3E%3Cpath%20d=%22M67.5,53.5%20L97.5,53.5%22/%3E%3Cpath%20d=%22M97.5,123.5%20L97.5,53.5%22/%3E%3Cpath%20d=%22M67.5%2066.5L87.5%2066.5M67.5%2076.5L87.5%2076.5M67.5%2086.5L87.5%2086.5M67.5%2096.5L87.5%2096.5M67.5%20106.5L87.5%20106.5%22/%3E%3Cpath%20d=%22M8.5,123.5%20L115.5,123.5%22/%3E%3C/g%3E%3C/svg%3E";
+#resourceController .icon-scene {
+  mask-image: url("data:image/svg+xml, #{$city}");
+  -webkit-mask-image: url("data:image/svg+xml, #{$city}");
+}
+
+$music: "%3Csvg%20width=%22128%22%20height=%22128%22%20style=%22enable-background:new%200%200%20128%20128;%22%20xmlns=%22http://www.w3.org/2000/svg%22%20xmlns:xlink=%22http://www.w3.org/1999/xlink%22%3E%3Cpath%20d=%22M30.93,15.01c-1.68,0.25-2.93,1.7-2.93,3.4V44v48.02c-4.54,0.15-9.55,2.34-13.6,6.38%20c-7.07,7.07-8.5,17.1-3.2,22.4c5.3,5.3,15.33,3.87,22.4-3.2c4.04-4.04,6.23-9.06,6.38-13.6H40V43.92c0-0.99,0.72-1.83,1.7-1.98%20l52-7.8c1.21-0.18,2.3,0.76,2.3,1.98v47.9c-4.54,0.15-9.55,2.34-13.6,6.38c-7.07,7.07-8.5,17.1-3.2,22.4%20c5.3,5.3,15.33,3.87,22.4-3.2c4.04-4.04,6.23-9.06,6.38-13.6H108V32V7.45V7.44c0-2.1-1.87-3.71-3.95-3.4L30.93,15.01z%22/%3E%3C/svg%3E";
+#resourceController .icon-music {
+  mask-image: url("data:image/svg+xml, #{$music}");
+  -webkit-mask-image: url("data:image/svg+xml, #{$music}");
+}
+
+$movie: "%3Csvg%20height=%22192pt%22%20viewBox=%220%20-8%20192%20192%22%20width=%22192pt%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath%20d=%22m176%200v32h-16v-32h-16v8h-96v-8h-16v32h-16v-32h-16v176h16v-32h16v32h16v-8h96v8h16v-32h16v32h16v-176zm-144%2048v32h-16v-32zm-16%2080v-32h16v32zm108.398438-33.300781-48%2032c-5.199219%203.402343-12.296876-.398438-12.398438-6.699219v-64c.101562-6.199219%207.199219-10%2012.398438-6.699219l48%2032c4.601562%203.199219%204.601562%2010.199219%200%2013.398438zm51.601562-46.699219v32h-16v-32zm-16%2080v-32h16v32zm0%200%22/%3E%3C/svg%3E";
+#resourceController .icon-camera {
+  mask-image: url("data:image/svg+xml, #{$movie}");
+  -webkit-mask-image: url("data:image/svg+xml, #{$movie}");
+}
+
+$globe: "%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2232%22%20height=%2232%22%20viewBox=%220%200%2032%2032%22%20class=%22svg-icon%22%3E%3Cpath%20d=%22M13.643%205.549c-.824.044-.711-.867-.756-1.155%200%200%20.31-.222.488-.288.178-.067.756-.067.867.288.109.355.223%201.11-.6%201.155zm2.019%201.798c.488-.354%201.045.023%201.445%200%20.398-.021.486-.533.666-.799.178-.268.953-.622.576-.999-.379-.377-2.199-.644-2.664-.045-.238.308-.979%201.156-1.356%201.332s-.178.866.066.91c.246.045.777-.044%201.266-.399zm2.223%202.2c-.133.156.068.49.51.49%200%20.333.09.866.533.754s.49-.756-.066-1.111c-.26-.165-.531-.91-.977-.133zm13.412%206.5c0%208.423-6.828%2015.25-15.25%2015.25S.797%2024.47.797%2016.047c0-8.422%206.828-15.25%2015.25-15.25s15.25%206.828%2015.25%2015.25zm-15.25%2012.81c1.311%200%202.574-.199%203.766-.566a1.616%201.616%200%200%200-.131-.313c-.353-.644-.512-1.954-.156-2.287.354-.334.51-1.199.244-1.422-.266-.221.18-.601.223-.843.246-.912-.244-.955-.998-1.179-.756-.221-1.51.09-2.486.112-.98.021-1.379-1.378-1.49-1.62-.354-.223-.842-.558-.775-1.045.066-.49.51-.91.531-1-.088-.289%200-.82.135-.999.221-.844%201.309-1.399%201.666-1.556.133-.577%201.266-1.132%201.531-1.019.266.11.512.532.934%200%20.42-.534.688-.378%201.332-.378.643%200%20.842.312%201.043.91.199.6%201.6.687%201.621.556.287-.954%201.088-.223%201.244-.223.934-.065%201.043-.466.934-1.022-.111-.555-1.045-.267-1.156-.51-.086-.192-.289-.622-.4-.4-.109.222-.486.688-.732.065-.244-.621-.932-1.331-1.109-1.221-.268.379-.602.377-.756.267-.621-.467-1.086.023-1.355.289-.266.267-.668.706-1.246.863-.576.154-.955-.245-1.021-.822-.066-.578.447-1.062.959-.797.512.267.953.045.732-.177s-.377-.845-.088-.954c.287-.111.488%200%20.977-.667s1.043-.444%201.688-.333c.644.111.467-.955.422-1.155s-.822-.644-.889-.489c-.065.155.111.866-.266%201.045-.379.179-.756-.424-1.067-.778-.312-.354.289-.687.356-.866.178-.644.912-1.177%201.6-.82s.82.089.777-.024c-.358-.422-.346-1.183%200-1.554.215-.231.418-.379.607-.469a12.742%2012.742%200%200%200-7.197-2.221c-2.697%200-5.197.842-7.264%202.271.664-.297%202.156-.422%202.195-.115.043.356.043%201.288.353%201.11.266-.134.578-.889%201.289-.355.709.532-.135%201.198-.355%201.554-.223.357-.312.933-1.066.666-.756-.267-.889.089-.934.355s-.531.488-1.154.312c-.623-.178-1.641.797-2.131%201.287-.268.267-2.371.923-2.064-.467.018-.08.037-.141.055-.215a12.738%2012.738%200%200%200-1.596%204.625c.594.18%201.832.518%202.051%201.475.266.399.797%201.644%201.332%202.31.857%201.073.27%201.593.355%202.443.443.222%201.109.71%201.775%201.067.666.354%201.156%201.287.135%201.643-.223.178.043%201.022-.4%201.199-.367.146-.869.754-1.334.968%202.293%202.155%205.369%203.487%208.758%203.487zm12.81-12.81c0-.194-.021-.383-.029-.575a4.99%204.99%200%200%201-.975-.151c-.42-.112-.733.332-.533.488.199.154.668.331.711.621.045.289-.443%201.599-.711%202.086-.266.49-.576.533-.733.313-.154-.223-.443-1.31-.777-1.933-.334-.621-.377-.134-.266.267.111.399.621%201.932.777%202.376.645.134.732.2.934.4.197.199-.045.467-.4.976-.355.512-1.621%202.844-1.687%203.265-.031.203.006.516-.014.863a12.765%2012.765%200%200%200%203.703-8.996z%22/%3E%3C/svg%3E";
+#resourceController .icon-basemap {
+  mask-image: url("data:image/svg+xml, #{$globe}");
+  -webkit-mask-image: url("data:image/svg+xml, #{$globe}");
+}
+
+$mountain: "%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22128%22%20height=%22128%22%3E%3Cpath%20d=%22M%205.5,99%20L%2043.4,26.2%2056.2,51%2077.8,14.9%20127.8,98.7%20Z%22%20stroke=%22none%22%20fill=%22black%22%20/%3E%3C/svg%3E";
+#resourceController .icon-ground {
+  mask-image: url("data:image/svg+xml, #{$mountain}");
+  -webkit-mask-image: url("data:image/svg+xml, #{$mountain}");
+}
+
+$filter: "%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2232%22%20height=%2232%22%20viewBox=%220%200%2032%2032%22%20class=%22svg-icon%22%3E%3Cpath%20d=%22M4%200h24v2H4V0zm10%2030h4l2-16h-8zm-2-18h8l8-8H4z%22/%3E%3C/svg%3E";
+#resourceController .icon-filter {
+  mask-image: url("data:image/svg+xml, #{$filter}");
+  -webkit-mask-image: url("data:image/svg+xml, #{$filter}");
+}

@@ -1,0 +1,41 @@
+html, body, #viewDiv {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#logDiv {
+  position: absolute;
+  bottom: 1.6em;
+  background: rgba(0, 0, 0, 0.5);
+  right: 0;
+  left: 0;
+  padding: 6px 6px 6px 6px;
+  color: white;
+  font-family: menlo, monospace;
+  font-size: 1em;
+  text-overflow: ellipsis;
+}
+
+#logDiv::before {
+  content: "> ";
+}
+
+#smallViewDiv {
+  width: 150px;
+  height: 100px;
+
+  position: absolute;
+
+  top: 15px;
+  right: 15px;
+
+  border: 1px solid #aaa;
+
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.esri-attribution {
+  visibility: hidden;
+}

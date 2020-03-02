@@ -1,0 +1,61 @@
+<script src="./support/setup.js"></script>
+<script>
+  requireOnLoaded([
+    "esri/Camera",
+    "esri/core/watchUtils",
+    "esri/layers/SceneLayer",
+    "esri/views/SceneView",
+    "dojo/domReady!"
+  ], function(
+    Camera,
+    watchUtils,
+    SceneLayer,
+    SceneView
+  ) {
+
+    sceneLayer = new SceneLayer({
+      url: "https://tilesqa.arcgis.com/tiles/SdQnSRS214Ul5Jv5/arcgis/rest/services/STM__4326__US_SanFrancisco__Buildings_OBB/SceneServer"
+    });
+
+    view = new SceneView({
+      container: "viewDiv",
+      map: {
+        basemap: "satellite",
+        ground: "world-elevation",
+        layers: [ sceneLayer ]
+      },
+      qualityProfile: "low"
+    });
+
+    view.when(() => {
+      const camera = new Camera({
+        "position": {
+          "spatialReference": {
+            "latestWkid": 3857,
+            "wkid": 102100
+          },
+          "x": -13622944.22508298,
+          "y": 4549998.123227517,
+          "z": 310.1285981759429
+        },
+        "heading": 262.4618845165347,
+        "tilt": 84.65666542235044
+      });
+
+      view.goTo(camera, { animate: false });
+    });
+
+    profileIdx = 0;
+    profiles = ["low", "medium", "high"];
+
+    window.play = () => {
+      profileIdx = (profileIdx + 1) % profiles.length;
+      view.qualityProfile = profiles[profileIdx];
+    }
+
+    watchUtils.init(view, "qualityProfile", (profile) => {
+        logMessage(`qualityProfile: ${profile}`);
+      });
+
+  });
+</script>

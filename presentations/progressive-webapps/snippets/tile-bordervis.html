@@ -1,0 +1,56 @@
+<script src="./support/setup.js"></script>
+<script>
+  requireOnLoaded([
+    "esri/Camera",
+    "esri/views/SceneView",
+    "dojo/domReady!"
+  ], function(
+    Camera,
+    SceneView
+  ) {
+    view = new SceneView({
+      container: "viewDiv",
+
+      map: {
+        basemap: "topo",
+        ground: "world-elevation"
+      },
+    });
+
+    view.when(() => {
+      const camera = new Camera({
+        "position": {
+          "spatialReference": {
+            "latestWkid": 3857,
+            "wkid": 102100
+          },
+          "x": -8927701.269161861,
+          "y": 2968761.173303283,
+          "z": 41041.06938177161
+        },
+        "heading": 358.91911785778655,
+        "tilt": 3.8486821729431617
+      });
+      view.goTo(camera, {
+        duration: 10000,
+        easing: "in-out-cubic"
+      });
+    });
+
+    let on = true;
+
+    window.play = () => {
+      view.basemapTerrain.setBorders(on);
+      view.basemapTerrain.suspended = on;
+      view.basemapTerrain.skirts = !on;
+
+      view.constraints.tilt.max = on ? 20 : 90;
+
+      on = !on;
+    }
+
+    view.watch("camera", (camera) => {
+      logMessage(`camera.tilt: ${Math.floor(camera.tilt)}`);
+    });
+  });
+</script>

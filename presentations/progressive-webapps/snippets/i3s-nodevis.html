@@ -1,0 +1,311 @@
+<script src="./support/setup.js"></script>
+<script>
+  requireOnLoaded([
+    "esri/layers/SceneLayer",
+    "esri/views/SceneView",
+
+    // i3s node vis
+    "engine/lib/Layer", "engine/lib/Object3D", "engine/lib/ModelContentType",
+    "engine/lib/Geometry", "engine/lib/GeometryUtil",
+    "engine/materials/DefaultMaterial",  "engine/materials/NativeLineMaterial",
+    "esri/views/3d/support/earthUtils", "esri/views/3d/support/projectionUtils",
+    "esri/core/libs/gl-matrix-2/math/vec3", "esri/core/libs/gl-matrix-2/math/mat4",
+    "esri/core/libs/gl-matrix-2/factories/vec3f64", "esri/core/libs/gl-matrix-2/factories/vec4f64",
+    "esri/core/libs/gl-matrix-2/factories/mat4f64",
+
+    "dojo/domReady!"
+  ], function(
+    SceneLayer,
+    SceneView,
+
+    // i3s node vis
+    Layer, Object3D, ModelContentType,
+    Geometry, GeometryUtil,
+    DefaultMaterial, NativeLineMaterial,
+    earthUtils, projectionUtils,
+    vec3, mat4, vec3d, vec4d, mat4d
+  ) {
+
+    var modelContentTypes = ModelContentType.modelContentTypes;
+
+    function I3SNodeVis(stage, renderCoordsHelper, layerID) {
+      var debugGeometry = new Geometry(GeometryUtil.createCylinderGeometry(1.0, 1.0, 64, [0, 0, 1], [0, 0, 0], false), "debugCylinder");
+      var debugGeometrySphere = new Geometry(GeometryUtil.createSphereGeometry(1.0, 16, 8), "debugSphere");
+      var debugGeometryBox = new Geometry(GeometryUtil.createBoxGeometry(2.0), "debugBox");
+
+      function makeMatParams(ambient) {
+        return {ambient: ambient, diffuse: [0, 0, 0], transparent: true, opacity: 0.2, blendModeOneOne: false};
+      }
+
+      var debugMaterials = {
+        red: new DefaultMaterial(makeMatParams([0.8, 0, 0]), "debugMaterialRed"),
+        grey: new DefaultMaterial(makeMatParams([0.4, 0.4, 0.4]), "debugMaterialGrey"),
+        brown: new DefaultMaterial(makeMatParams([0.2, 0.1, 0]), "debugMaterialBrown"),
+        green: new DefaultMaterial(makeMatParams([0.0, 0.8, 0.0]), "debugMaterialGreen"),
+        blue: new DefaultMaterial(makeMatParams([0.0, 0.0, 0.8]), "debugMaterialBlue"),
+        yellow: new DefaultMaterial(makeMatParams([0.8, 0.8, 0.0]), "debugMaterialYellow"),
+        magenta: new DefaultMaterial(makeMatParams([0.8, 0.0, 0.8]), "debugMaterialMagenta"),
+        level9: new DefaultMaterial(makeMatParams([0, 0, 0]), "debugMaterialLevel9"),
+        level8: new DefaultMaterial(makeMatParams([1, 0, 0]), "debugMaterialLevel8"),
+        level7: new DefaultMaterial(makeMatParams([0, 0, 1]), "debugMaterialLevel7"),
+        level6: new DefaultMaterial(makeMatParams([1, 0.25, 0.25]), "debugMaterialLevel6"),
+        level5: new DefaultMaterial(makeMatParams([0.25, 0.25, 1]), "debugMaterialLevel5"),
+        level4: new DefaultMaterial(makeMatParams([1, 0.5, 0.5]), "debugMaterialLevel4"),
+        level3: new DefaultMaterial(makeMatParams([0.5, 0.5, 1]), "debugMaterialLevel3"),
+        level2: new DefaultMaterial(makeMatParams([1, 0.75, 0.75]), "debugMaterialLevel2"),
+        level1: new DefaultMaterial(makeMatParams([0.75, 0.75, 1]), "debugMaterialLevel1"),
+        level0: new DefaultMaterial(makeMatParams([1, 1, 1]), "debugMaterialLevel0"),
+      };
+
+      var lineMaterials = {
+        red: new NativeLineMaterial({ color: [0.8, 0, 0, 1] }, "debugMaterialRed"),
+        grey: new NativeLineMaterial({ color: [0.4, 0.4, 0.4, 1] }, "debugMaterialGrey"),
+        brown: new NativeLineMaterial({ color: [0.2, 0.1, 0, 1] }, "debugMaterialBrown"),
+        green: new NativeLineMaterial({ color: [0.0, 0.8, 0.0, 1] }, "debugMaterialGreen"),
+        blue: new NativeLineMaterial({ color: [0.0, 0.0, 0.8, 1] }, "debugMaterialBlue"),
+        lightblue: new NativeLineMaterial({ color: [0.5, 0.5, 1, 1] }, "debugMaterialLightBlue"),
+        yellow: new NativeLineMaterial({ color: [0.8, 0.8, 0.0, 1] }, "debugMaterialYellow"),
+        magenta: new NativeLineMaterial({ color: [0.8, 0.0, 0.8, 1] }, "debugMaterialMagenta"),
+        level9: new NativeLineMaterial({ color: [0, 0, 0, 1] }, "debugMaterialLevel9"),
+        level8: new NativeLineMaterial({ color: [1, 0, 0, 1] }, "debugMaterialLevel8"),
+        level7: new NativeLineMaterial({ color: [0, 0, 1, 1] }, "debugMaterialLevel7"),
+        level6: new NativeLineMaterial({ color: [1, 0.2, 0.2, 1] }, "debugMaterialLevel6"),
+        level5: new NativeLineMaterial({ color: [0.2, 0.2, 1, 1] }, "debugMaterialLevel5"),
+        level4: new NativeLineMaterial({ color: [1, 0.4, 0.4, 1] }, "debugMaterialLevel4"),
+        level3: new NativeLineMaterial({ color: [0.4, 0.4, 1, 1] }, "debugMaterialLevel3"),
+        level2: new NativeLineMaterial({ color: [1, 0.6, 0.6, 1] }, "debugMaterialLevel2"),
+        level1: new NativeLineMaterial({ color: [0.6, 0.6, 1, 1] }, "debugMaterialLevel1"),
+        level0: new NativeLineMaterial({ color: [1, 1, 1, 1] }, "debugMaterialLevel0")
+      };
+
+      for (var name in debugMaterials) {
+        stage.add(modelContentTypes.MATERIAL, debugMaterials[name]);
+      }
+
+      stage.add(modelContentTypes.GEOMETRY, debugGeometry);
+      var layer = new Layer(layerID + "_debug", {isPickable: false}, layerID + "_debug");
+      stage.add(modelContentTypes.LAYER, layer);
+      stage.addToViewContent([layer.id]);
+
+      var node_center = vec3d.create();
+      var trafo = mat4d.create();
+
+      this.engineLayer = layer;
+      this.added = {};
+      this.show = function (layerId, node, mbs, indexSR, color) {
+
+        var mat = lineMaterials[color];
+        if (!mat) {
+          console.warn("Missing material", color);
+          return;
+        }
+
+        if (!mbs) {
+          mbs = vec4d.create();
+          projectionUtils.mbsToMbs(node.mbs, indexSR, mbs, renderCoordsHelper.spatialReference);
+        }
+
+        var name = layerId + "node" + node.id + "dbg";
+        vec3.copy(node_center, mbs);
+        var r2 = mbs[3];
+
+        if (r2 > earthUtils.earthRadius / 10 && renderCoordsHelper.spatialReference === projectionUtils.SphericalECEFSpatialReference) {
+          //find intersection with earth
+          //from http://stackoverflow.com/questions/23918737/sphere-sphere-intersection-and-circle-sphere-intersection
+          //node_center = [];
+          //projectionUtils.vectorToVector(node.mbs, indexSR, node_center, renderCoordsHelper.spatialReference);
+
+          this.showWS(node_center, Math.max(r2 * 0.01, 10000), color, name + "_center");
+
+          var d = vec3.length(node_center);
+          var r1 = earthUtils.earthRadius;
+
+          if (r1 + r2 > d) {
+            var x = (d * d + r1 * r1 - r2 * r2) / (2.0 * d);
+            vec3.scale(node_center, node_center, x / d);
+            //r_i = sqrt(r_1 * r_1 - h * h * d * d)
+            r2 = Math.sqrt(r1 * r1 - x * x);
+          }
+        }
+
+        mat4.identity(trafo);
+        mat4.scale(trafo, trafo, [r2, r2, r2]);
+        mat4.rotateX(trafo, trafo, 1.5708);
+
+        var object = new Object3D({
+          name: name,
+          geometries: [debugGeometrySphere],
+          materials: [mat],
+          transformations: [trafo],
+          castShadow: false,
+          idHint: name
+        });
+
+        projectionUtils.computeLinearTransformation(indexSR, node.mbs, trafo, renderCoordsHelper.spatialReference);
+
+        if (node_center != null) {
+          trafo[12] = node_center[0];
+          trafo[13] = node_center[1];
+          trafo[14] = node_center[2];
+        }
+
+        object.objectTransformation = trafo;
+
+        this._addToStage(object, name);
+      };
+
+      this.showBox = function (layerId, node, obb, color) {
+
+        var mat = lineMaterials[color];
+        if (!mat) {
+          console.warn("Missing material", color);
+          return;
+        }
+
+        mat4.fromQuat(trafo, obb.quaternion);
+        mat4.scale(trafo, trafo, obb.halfSize);
+
+        trafo[12] = obb.center[0];
+        trafo[13] = obb.center[1];
+        trafo[14] = obb.center[2];
+
+        var name = layerId + "node" + (node.id || node.resourceId) + "dbg";
+        var object = new Object3D({
+          name: name,
+          geometries: [debugGeometryBox],
+          materials: [mat],
+          transformations: [trafo],
+          castShadow: false,
+          idHint: name
+        });
+
+        this._addToStage(object, name);
+      };
+
+      this.showWS = function (positionWS, size, color, name) {
+
+        var mat = debugMaterials[color];
+        if (!mat) {
+          console.warn("Missing material", color);
+          return;
+        }
+
+        var trafo = mat4d.create();
+        mat4.scale(trafo, trafo, [size, size, size]);
+
+        var object = new Object3D({
+          name: name,
+          geometries: [debugGeometrySphere],
+          materials: [mat],
+          transformations: [trafo],
+          castShadow: false,
+          idHint: name
+        });
+
+        var transl = mat4d.create();
+        mat4.translate(transl, transl, positionWS);
+        object.objectTransformation = transl;
+
+        this._addToStage(object, name);
+      };
+
+      this._addToStage = function (object, name) {
+        stage.add(modelContentTypes.OBJECT, object);
+        this.engineLayer.addObject(object);
+
+        var prev = this.added[name];
+        if (prev !== undefined) {
+          stage.remove(modelContentTypes.OBJECT, prev.id);
+          this.engineLayer.removeObject(prev);
+        }
+
+        this.added[name] = object;
+      };
+
+      this.clear = function () {
+        for (var objIdx in this.added) {
+          var obj = this.added[objIdx];
+          stage.remove(modelContentTypes.OBJECT, obj.id);
+          this.engineLayer.removeObject(obj);
+        }
+        this.added = {};
+      };
+
+      this.dispose = function () {
+        this.clear();
+        for (var i in debugMaterials) {
+          stage.remove(modelContentTypes.MATERIAL, debugMaterials[i].id);
+        }
+        stage.remove(modelContentTypes.GEOMETRY, debugGeometry.id);
+        stage.remove(modelContentTypes.LAYER, this.engineLayer.id);
+      };
+    }
+
+    sceneLayer = new SceneLayer({
+      url: "https://tilesqa.arcgis.com/tiles/SdQnSRS214Ul5Jv5/arcgis/rest/services/STM__4326__US_SanFrancisco__Buildings_OBB/SceneServer"
+    });
+
+    view = new SceneView({
+      container: "viewDiv",
+      map: {
+        basemap: "topo",
+        ground: "world-elevation",
+        layers: [ sceneLayer ]
+      }
+    });
+
+    view.when(() => {
+      view.goTo(sceneLayer.fullExtent, {
+        duration: 10000,
+        easing: "in-out-cubic"
+      });
+    });
+
+    window.play = () => {
+      const opacity = 0.3;
+
+      view.map.ground.opacity = opacity;
+
+      sceneLayer.renderer = {
+        type: "simple",
+        symbol: {
+          type: "mesh-3d",
+          symbolLayers: [{
+            type: "fill",
+            material: { color: [255, 255,255, opacity] }
+          }]
+        }
+      };
+
+
+
+      view.when(() => {
+        const vis = new I3SNodeVis(view._stage, view.renderCoordsHelper, "id");
+
+        view.whenLayerView(sceneLayer).then((lv) => {
+          var layerId = lv.layer.uid;
+          var controller = lv._controller;
+          var culler = controller._viewportQueries;
+          var index = controller._index;
+          var root = index && index.rootNode;
+          if (root == null) {
+            return;
+          }
+          index.traverse(root, function(node) {
+            var color = "green";
+            if (controller.isGeometryVisible(node)) { // compute obb
+              if (node.renderObb && node.renderObb.halfSize[0] >= 0){
+                vis.showBox(layerId, node, node.renderObb, color);
+              } else if (node.renderMbs && node.renderMbs[3] >= 0) {
+                vis.show(layerId, node, node.renderMbs, controller.crsIndex, color);
+              }
+            }
+
+            return true;
+          });
+        });
+      });
+    }
+
+  });
+</script>

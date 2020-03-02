@@ -1,0 +1,162 @@
+<script src="./support/setup.js"></script>
+<script>
+  requireOnLoaded([
+    "esri/Camera",
+    "esri/Graphic",
+    "esri/geometry/Point",
+    "esri/layers/FeatureLayer",
+    "esri/renderers/SimpleRenderer",
+    "esri/symbols/PointSymbol3D",
+    "esri/symbols/WebStyleSymbol",
+    "esri/views/SceneView",
+    "dojo/domReady!"
+  ], function(
+    Camera,
+    Graphic,
+    Point,
+    FeatureLayer,
+    SimpleRenderer,
+    PointSymbol3D,
+    WebStyleSymbol,
+    SceneView
+  ) {
+    view = new SceneView({
+      container: "viewDiv",
+
+      map: {
+        basemap: "topo"
+      },
+
+      environment: {
+        background: {
+          type: "color", // autocasts as new ColorBackground()
+          color: [255, 255, 255, 0.1]
+        },
+        ligthing: {
+          directShadowsEnabled: true
+        },
+        // disable stars
+        starsEnabled: false,
+        //disable atmosphere
+        atmosphereEnabled: false
+      }
+    });
+
+    point = new Point({
+      "spatialReference": {
+            "latestWkid"  : 3857,
+            "wkid": 102100
+          },
+          "x": 1000000,
+          "y": 1000000,
+          "z": 0
+    });
+
+    symbolIdx = 0;
+    symbols = [
+      new PointSymbol3D({
+        type: "icon",
+        size: 80,
+        resource: { primitive: "square" },
+        material: { color: "red" }
+      }),
+      new PointSymbol3D({
+        type: "object",
+        width: 4,
+        height: 2,
+        depth: 4,
+        resource: { primitive: "cube" },
+        material: { color: "red" }
+      }),
+      new WebStyleSymbol({
+        name: "Ford_Mustang",
+        styleName: "EsriRealisticTransportationStyle"
+      })
+    ];
+
+    graphic = new Graphic({
+      geometry: point,
+      symbol: symbols[0]
+    })
+
+    featureLayer = new FeatureLayer({
+      elevationInfo: {
+        mode: "absolute-height"
+      },
+      source: [graphic],
+      fields: [{
+        name: "ObjectID",
+        alias: "ObjectID",
+        type: "oid"
+      }],
+      renderer: new SimpleRenderer({
+        symbol: symbols[0]
+      })
+    });
+
+    view.when(() => {
+      view.map.basemap.baseLayers.removeAll();
+      view.map.ground.opacity = 0.5;
+      // view.basemapTerrain.suspended = true;
+
+      view.map.layers.add(featureLayer);
+
+      let cameraAngleRad = 0;
+      const cameraDistance = 10;
+      const cameraAltitude = 5;
+      function animateCamera() {
+        view.camera = new Camera({
+          position: {
+            spatialReference: {
+              wkid: 102100
+            },
+            x: point.x + cameraDistance * Math.cos(cameraAngleRad),
+            y: point.y + cameraDistance * Math.sin(cameraAngleRad),
+            z: cameraAltitude
+          },
+          heading: 360 - cameraAngleRad / Math.PI * 180 - 90,
+          tilt: 60
+        });
+
+        cameraAngleRad += 0.01;
+
+        window.requestAnimationFrame(animateCamera);
+      }
+      animateCamera();
+    });
+
+
+
+    window.play = () => {
+      symbolIdx = (symbolIdx + 1) % symbols.length;
+
+      featureLayer.renderer = new SimpleRenderer({
+        symbol: symbols[symbolIdx]
+      });
+    }
+
+    let fpsTimestamp = 0;
+    const fpsMeasurements = new Array(90);
+    let fpsMeasurementsIndex = 0;
+
+    function measureFramesPerSecond() {
+      const now = performance.now()
+      const milisecondsBetweenAnimationFrames = now - fpsTimestamp;
+      fpsTimestamp = now;
+
+      fpsMeasurements[fpsMeasurementsIndex] = Math.round(1000 / milisecondsBetweenAnimationFrames);
+      fpsMeasurementsIndex = (fpsMeasurementsIndex + 1) % fpsMeasurements.length;
+
+      window.requestAnimationFrame(() => measureFramesPerSecond());
+    }
+
+    measureFramesPerSecond();
+
+    window.setInterval(() => {
+      const fpsRate = Math.floor(fpsMeasurements.reduce((sum, cur) => (sum + cur), 0) / fpsMeasurements.length);
+      const usedMemory = view.resourceInfo ? Math.floor(view.resourceInfo.usedMemory / 1e+3) : "?";
+      logMessage(`FPS: ${fpsRate}, Memory: ${usedMemory} KB`);
+    }, 1000);
+
+  });
+</script>

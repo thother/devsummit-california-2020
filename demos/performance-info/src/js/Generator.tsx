@@ -199,12 +199,14 @@ export class Generator extends declared(Widget) {
     this.graphicsLayer.graphics.forEach(async (graphic) => {
       if (resource.symbol.type === "web-style") {
         const symbol: PointSymbol3D = await resource.symbol.fetchSymbol();
+
         if (resource.scale) {
           const symbolLayer = symbol.symbolLayers.getItemAt(0) as ObjectSymbol3DLayer;
           symbolLayer.width *= resource.scale;
           symbolLayer.height *= resource.scale;
           symbolLayer.depth *= resource.scale;
         }
+
         graphic.symbol = symbol;
       } else {
         graphic.symbol = resource.symbol;
@@ -221,7 +223,10 @@ export class Generator extends declared(Widget) {
           },
           "x": -8238112.846146458,
           "y": 4970465.220192298
-        })
+        }),
+        attributes: {
+          "OBJECTID": i
+        }
       }));
     }
   }

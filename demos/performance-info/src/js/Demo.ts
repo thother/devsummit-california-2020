@@ -550,11 +550,13 @@ class Demo extends declared(Accessor)  {
 
         // --
 
+        let needsStateReset = false;
+
         const graphicsLength = graphicsLayer.graphics.length;
 
         for (let i = 0; i < graphicsLength; i++)  {
           const graphic = graphicsLayer.graphics.getItemAt(i);
-          const uid = (graphic as any).uid;
+          const uid = graphic.attributes["OBJECTID"];
 
           const speed = 10;
           const distance = (i / graphicsLength * carAnimationLineLength + (Date.now() - config.start) / 1000 * speed) % carAnimationLineLength;
@@ -576,7 +578,13 @@ class Demo extends declared(Accessor)  {
 
             graphic.symbol = symbol;
             config.states.set(uid, idx);
+
+            needsStateReset = true;
           }
+        }
+
+        if (needsStateReset) {
+          animator.resetState();
         }
       }
     }, {
@@ -621,6 +629,8 @@ class Demo extends declared(Accessor)  {
 
         // --
 
+        let needsStateReset = false;
+
         type State = {
           startOffset: number;
           speed: number;
@@ -636,7 +646,7 @@ class Demo extends declared(Accessor)  {
 
         for (let i = 0; i < graphicsLength; i++)  {
           const graphic = graphicsLayer.graphics.getItemAt(i);
-          const uid = (graphic as any).uid;
+          const uid = graphic.attributes["OBJECTID"];
 
           const areaRadius = 1000;
           const windAngle = 260;
@@ -680,15 +690,23 @@ class Demo extends declared(Accessor)  {
 
           graphic.geometry = clone;
 
-          const needsSymbolUpdate = !state.symbol || state.symbol !== graphic.symbol;
-          if (needsSymbolUpdate && graphic.symbol) {
+          if (graphic.symbol && (!state.symbol || state.symbol !== graphic.symbol)) {
             const symbol = (graphic.symbol as PointSymbol3D).clone() as PointSymbol3D;
             const symbolLayer = symbol.symbolLayers.getItemAt(0) as ObjectSymbol3DLayer;
-            symbolLayer.heading = 360 - Math.atan2(state.y2 - state.y1, state.x2 - state.x1) / Math.PI * 180 + 90;
-            symbolLayer.roll = symbolLayer.heading  > windAngle ?  30 : -30;
+            symbolLayer.heading = (360 - Math.atan2(state.y2 - state.y1, state.x2 - state.x1) / Math.PI * 180 + 90) % 360;
+            symbolLayer.roll = symbolLayer.heading > windAngle ?  30 : -30;
+
+            if (!state.symbol) {
+              needsStateReset = true;
+            }
+
             graphic.symbol = symbol;
             state.symbol = symbol;
           }
+        }
+
+        if (needsStateReset) {
+          animator.resetState();
         }
       }
     }, {
@@ -733,11 +751,13 @@ class Demo extends declared(Accessor)  {
 
         // --
 
+        let needsStateReset = false;
+
         const graphicsLength = graphicsLayer.graphics.length;
 
         for (let i = 0; i < graphicsLength; i++)  {
           const graphic = graphicsLayer.graphics.getItemAt(i);
-          const uid = (graphic as any).uid;
+          const uid = graphic.attributes["OBJECTID"];
 
           const distance = 100;
 
@@ -750,7 +770,13 @@ class Demo extends declared(Accessor)  {
             clone.z = 0;
   
             graphic.geometry = clone;
+
+            needsStateReset = true;
           }
+        }
+
+        if (needsStateReset) {
+          animator.resetState();
         }
       }
     }, {
@@ -777,6 +803,8 @@ class Demo extends declared(Accessor)  {
       tick: (ticks, resources) => {
         const {config, view} = resources;
 
+        let needsStateReset = false;
+
         type State = {
           verticalOffset: number;
           horizontalOffset: number;
@@ -797,7 +825,7 @@ class Demo extends declared(Accessor)  {
 
         for (let i = 0; i < graphicsLength; i++)  {
           const graphic = graphicsLayer.graphics.getItemAt(i);
-          const uid = (graphic as any).uid;
+          const uid = graphic.attributes["OBJECTID"];
 
           const areaRadius = 10000;
           const windAngle = 260;
@@ -833,12 +861,12 @@ class Demo extends declared(Accessor)  {
             } as State);
           }
           const state: State = config.states.get(uid);
-          const {x1, y1, x2, y2, speed, startOffset, horizontalOffset} = state;
+          const {x1, y1, x2, y2, speed, startOffset, horizontalOffset, lineLength} = state;
 
           const distance = (Date.now() - config.start) / 1000 * speed + startOffset;
 
 
-          const fraction = (distance % length) / length;
+          const fraction = (distance % lineLength) / lineLength;
 
           const clone = graphic.geometry.clone() as Point;
           clone.x = x1 + fraction * (x2 - x1);
@@ -851,9 +879,18 @@ class Demo extends declared(Accessor)  {
             const symbol = (graphic.symbol as PointSymbol3D).clone() as PointSymbol3D;
             const symbolLayer = symbol.symbolLayers.getItemAt(0) as ObjectSymbol3DLayer;
             symbolLayer.heading = 360 - Math.atan2(y2 - y1, x2 - x1) / Math.PI * 180 + 90;
+
+            if (!state.symbol) {
+              needsStateReset = true;
+            }
+
             graphic.symbol = symbol;
             state.symbol = symbol;
           }
+        }
+
+        if (needsStateReset) {
+          animator.resetState();
         }
 
         // --
@@ -907,17 +944,20 @@ class Demo extends declared(Accessor)  {
         };
       }
 
+      animationScenarios.forEach((scenario) => {
+        scenario.config.states && scenario.config.states.clear();
+      });
 
       let scenario = animationScenarios.find((scenario) => scenario.name === name);
       if (!scenario) {
         scenario = animationScenarios[1];
       }
-
       animator.scenario = scenario;
 
       if (!animator.cameraEnabled) {
         animator.startCamera();
       }
+
     }});
     view.ui.add(generator, "manual");
 

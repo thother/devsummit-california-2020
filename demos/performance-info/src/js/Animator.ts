@@ -3,7 +3,6 @@ import Camera = require("esri/Camera");
 import { declared, subclass, property } from "esri/core/accessorSupport/decorators";
 import Accessor = require("esri/core/Accessor");
 import GraphicsLayer = require("esri/layers/GraphicsLayer");
-import Point = require("esri/geometry/Point");
 import PointSymbol3D = require("esri/symbols/PointSymbol3D");
 import { ObjectSymbol3DLayer } from "esri/symbols";
 import watchUtils = require("esri/core/watchUtils");
@@ -85,6 +84,11 @@ export class Animator extends declared(Accessor) {
     this.audioEnabled = false;
   }
 
+  resetState(): void {
+    this.rotationHeadings.clear();
+    this.rotationStates.clear();
+  }
+
   private ticks = 0;
 
   private animateCamera(): void {
@@ -155,17 +159,13 @@ export class Animator extends declared(Accessor) {
 
       for (let i = 0; i < numFeatures; i++) {
         const graphic = this.graphicsLayer.graphics.getItemAt(i);
-        const geometry = graphic.geometry.clone() as Point;
-        const uid = (graphic as any).uid;
-
-        geometry.z = geometry.z || 0;
+        const uid = graphic.attributes["OBJECTID"];
 
 
-        if (this.average > 0.1) {
-          geometry.z = this.average / 20;
+        if (this.average > 20) {
 
           let angle = this.rotationStates.get(uid) || 0;
-          if (bufferAverage > 40 && angle < 1) {
+          if (angle < 1) {
             this.rotationStates.set(uid, angle + Math.floor(bufferAverage / 20) * 360);
           } else {
             this.rotationStates.set(uid, angle * 0.9); 
@@ -173,8 +173,6 @@ export class Animator extends declared(Accessor) {
 
           requestFrame = true;
         }
-       
-        graphic.geometry = geometry;
       }
     }
 
@@ -185,13 +183,14 @@ export class Animator extends declared(Accessor) {
         return;
       }
 
-      const uid = (graphic as any).uid;
+      const uid = graphic.attributes["OBJECTID"];
       const clone = (graphic.symbol as PointSymbol3D).clone() as PointSymbol3D;
       const symbolLayer = clone.symbolLayers.getItemAt(0) as ObjectSymbol3DLayer;
 
       if (symbolLayer && symbolLayer.type === "object") {
         if (!this.rotationHeadings.has(uid)) {
           this.rotationHeadings.set(uid, symbolLayer.heading);
+          this.rotationStates.set(uid, 0);
         }
 
         symbolLayer.heading = this.rotationHeadings.get(uid) + this.rotationStates.get(uid);
@@ -224,7 +223,6 @@ export class Animator extends declared(Accessor) {
 
     this.audioElement = audioElement;
 
-    // for legacy browsers
     const AudioContext = (window as any).AudioContext || (window as any).webkitAudioContext;
     this.audioContext = new AudioContext();
     const audioSource = this.audioContext.createMediaElementSource(audioElement);

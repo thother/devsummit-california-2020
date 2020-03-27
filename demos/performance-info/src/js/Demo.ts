@@ -17,8 +17,8 @@
 import SceneView = require("esri/views/SceneView");
 
 
-import { ResourceInfo, SceneViewWithResourceInfo } from "./ResourceInfo";
-import { PerformanceInfo } from "./PerformanceInfo";
+import { PerformanceInfo, SceneViewWithPerformanceInfo } from "./PerformanceInfo";
+import { FPSInfo } from "./FPSInfo";
 import { Generator } from "./Generator";
 
 import { Scenario as AnimationScenario } from "./Animator";
@@ -118,7 +118,7 @@ class Demo extends declared(Accessor)  {
         }
       },
       container: this.viewDiv
-    }) as SceneViewWithResourceInfo;
+    }) as SceneViewWithPerformanceInfo;
 
     this.animator = new Animator({ view, graphicsLayer })
 
@@ -129,7 +129,7 @@ class Demo extends declared(Accessor)  {
   viewDiv: string = null;
 
   @property()
-  private view: SceneViewWithResourceInfo = null;
+  private view: SceneViewWithPerformanceInfo = null;
 
   @property()
   private sceneLayerView: SceneLayerView = null;
@@ -921,11 +921,11 @@ class Demo extends declared(Accessor)  {
     }});
     view.ui.add(generator, "manual");
 
-    const resourceInfo = new ResourceInfo({ view });
-    view.ui.add(resourceInfo, "manual");
+    const performanceInfo = new PerformanceInfo({ view });
+    view.ui.add(performanceInfo, "manual");
 
-    const performanceInfoInfo = new PerformanceInfo();
-    view.ui.add(performanceInfoInfo, "manual");
+    const fpsInfo = new FPSInfo();
+    view.ui.add(fpsInfo, "manual");
 
 
     await view.when();

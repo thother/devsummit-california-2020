@@ -1,4 +1,3 @@
-
 import { subclass, declared } from "esri/core/accessorSupport/decorators";
 import Widget = require("esri/widgets/Widget");
 import watchUtils = require("esri/core/watchUtils");
@@ -21,8 +20,8 @@ const MESSAGES = {
   tooltip_fps: "Shows the current number of frames per second."
 }
 
-@subclass("esri.widgets.PerformanceInfo")
-export class PerformanceInfo extends declared(Widget) {
+@subclass("esri.widgets.FPSInfo")
+export class FPSInfo extends declared(Widget) {
   //--------------------------------------------------------------------------
   //
   //  Lifecycle
@@ -60,7 +59,7 @@ export class PerformanceInfo extends declared(Widget) {
 
     return (
       <div 
-        id="performanceInfo"
+        id="fpsInfo"
         class={fps > 50 ? CSS.green : fps > 30 ? CSS.yellow : CSS.red}>
         <span class={CSS.tooltip_left} aria-label={MESSAGES.tooltip_fps}>{Math.floor(fps)}</span>
       </div>

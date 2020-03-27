@@ -27,7 +27,7 @@ table tbody td:first-child {
 }
 
 
-#performanceInfo  {
+#fpsInfo  {
   position: absolute;
 
   top: 40px;
@@ -50,27 +50,27 @@ table tbody td:first-child {
   -webkit-text-stroke: 1px #333
 }
 
-#performanceInfo.green {
+#fpsInfo.green {
   background-color: rgba(0, 255, 0, 0.25);
   color: rgb(0, 255, 0);
 }
-#performanceInfo.yellow {
+#fpsInfo.yellow {
   background-color: rgba(255, 255, 0, 0.25);
   color: rgb(255, 255, 0);
 }
-#performanceInfo.red {
+#fpsInfo.red {
   background-color: rgba(255, 0, 0, 0.25);
   color: rgb(255, 0, 0);
 }
 
-#performanceInfo span {
+#fpsInfo span {
   display: table-cell;
   text-align: center;
   vertical-align: middle;
 }
 
 
-#resourceInfo {
+#performanceInfo {
   position: absolute;
 
   border: 1px solid #AAA;
@@ -89,12 +89,12 @@ table tbody td:first-child {
   left: 40px;
 }
 
-#resourceInfo .memoryIndicator {
+#performanceInfo .memoryIndicator {
   border: 1px solid gray;
   width: 80px;
 }
 
-#resourceInfo .memoryIndicatorValue {
+#performanceInfo .memoryIndicatorValue {
   background-color: red;
   height: 10px
 }

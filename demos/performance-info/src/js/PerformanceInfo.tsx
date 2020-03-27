@@ -37,7 +37,7 @@ const MESSAGES = {
   unsupported: "This layer is not supported"
 }
 
-type SceneViewResourceInfo = {
+type SceneViewPerformanceInfo = {
   /**
    * The total memory available in bytes.
    *
@@ -95,14 +95,14 @@ type SceneViewResourceInfo = {
   /**
    * An array containing information about non-tiled layers.
    *
-   * @name resources
+   * @name layerPerformanceInfo
    * @instance
-   * @type {Array<LayerResourceInfo>}
+   * @type {Array<LayerPerformanceInfo>}
    */
-  layerResourceInfo: LayerResourceInfo[];
+  layerPerformanceInfos: LayerPerformanceInfo[];
 }
 
-type LayerResourceInfo = {
+type LayerPerformanceInfo = {
   /**
    * The layer.
    *
@@ -150,14 +150,14 @@ type LayerResourceInfo = {
   totalFeatures: number;
 }
 
-export type SceneViewWithResourceInfo = SceneView & { resourceInfo: SceneViewResourceInfo };
+export type SceneViewWithPerformanceInfo = SceneView & { performanceInfo: SceneViewPerformanceInfo };
 
 type CtorProperties = {
-  view: SceneViewWithResourceInfo;
+  view: SceneViewWithPerformanceInfo;
 }
 
-@subclass("esri.widgets.ResourceInfo")
-export class ResourceInfo extends declared(Widget) {
+@subclass("esri.widgets.PerformanceInfo")
+export class PerformanceInfo extends declared(Widget) {
   //--------------------------------------------------------------------------
   //
   //  Lifecycle
@@ -190,7 +190,7 @@ export class ResourceInfo extends declared(Widget) {
   //--------------------------------------------------------------------------
 
   @property()
-  view: SceneViewWithResourceInfo = null;
+  view: SceneViewWithPerformanceInfo = null;
 
   //----------------------------------
   //  visible
@@ -234,10 +234,10 @@ export class ResourceInfo extends declared(Widget) {
 
     return (
       <div
-        id="resourceInfo"
+        id="performanceInfo"
         class={className}
         role="presentation"
-        key="esri-resource-info__root">
+        key="esri-performance-info__root">
         {this.renderContainerNode()}
       </div>
     );
@@ -252,15 +252,15 @@ export class ResourceInfo extends declared(Widget) {
       return this.renderUnsupportedMessage();
     }
 
-    const resourceInfo = this.view.resourceInfo;
+    const performanceInfo = this.view.performanceInfo;
 
-    const layerResourceInfoNodes: VNode[] = [];
-    for (const layerResourceInfo of resourceInfo.layerResourceInfo) {
-      layerResourceInfoNodes.push(this.renderLayerResourceInfoNode(resourceInfo, layerResourceInfo));
+    const layerPerformanceInfoNodes: VNode[] = [];
+    for (const layerPerformanceInfo of performanceInfo.layerPerformanceInfos) {
+      layerPerformanceInfoNodes.push(this.renderLayerPerformanceInfoNode(performanceInfo, layerPerformanceInfo));
     }
 
     return (
-      <div key="resource-info_root">
+      <div key="performance-info_root">
         <table>
           <thead>
             <tr>
@@ -270,11 +270,11 @@ export class ResourceInfo extends declared(Widget) {
           <tbody>
             <tr>
               <td>Quality:</td>
-              <td colspan="2">{Math.round(100 * resourceInfo.quality)}%</td>
+              <td colspan="2">{Math.round(100 * performanceInfo.quality)}%</td>
             </tr>
             <tr>
               <td>Load:</td>
-              <td colspan="2">{Math.floor(resourceInfo.load)}</td>
+              <td colspan="2">{Math.floor(performanceInfo.load)}</td>
             </tr>
           </tbody>
           <thead>
@@ -285,22 +285,22 @@ export class ResourceInfo extends declared(Widget) {
           <tbody>
             <tr>
               <td>Total:</td>
-              <td colspan="2">{toScientificNotation(resourceInfo.totalMemory)}</td>
+              <td colspan="2">{toScientificNotation(performanceInfo.totalMemory)}</td>
             </tr>
             <tr>
               <td>Used:</td>
-              <td>{toScientificNotation(resourceInfo.usedMemory)}</td>
-              <td>{this.renderMemoryBar("usedMemory", resourceInfo)}</td>
+              <td>{toScientificNotation(performanceInfo.usedMemory)}</td>
+              <td>{this.renderMemoryBar("usedMemory", performanceInfo)}</td>
             </tr>
             <tr>
               <td>Terrain:</td>
-              <td>{toScientificNotation(resourceInfo.terrainMemory)}</td>
-              <td>{this.renderMemoryBar("terrainMemory", resourceInfo)}</td>
+              <td>{toScientificNotation(performanceInfo.terrainMemory)}</td>
+              <td>{this.renderMemoryBar("terrainMemory", performanceInfo)}</td>
             </tr>
             <tr>
               <td>Edges:</td>
-              <td>{toScientificNotation(resourceInfo.edgesMemory)}</td>
-              <td>{this.renderMemoryBar("edgesMemory", resourceInfo)}</td>
+              <td>{toScientificNotation(performanceInfo.edgesMemory)}</td>
+              <td>{this.renderMemoryBar("edgesMemory", performanceInfo)}</td>
             </tr>
           </tbody>
           <thead>
@@ -309,7 +309,7 @@ export class ResourceInfo extends declared(Widget) {
             </tr>
           </thead>
           <tbody>
-            {layerResourceInfoNodes}
+            {layerPerformanceInfoNodes}
           </tbody>
         </table>
       </div>
@@ -328,13 +328,13 @@ export class ResourceInfo extends declared(Widget) {
   private renderUnsupportedMessage(): VNode {
     return (
       <div
-        key="resource-info__unsupported">
+        key="performance-info__unsupported">
         <p>{MESSAGES.unsupported}</p>
       </div>
     );
   }
 
-  private renderLayerResourceInfoNode(resourceInfo: SceneViewResourceInfo, layerResourceInfo: LayerResourceInfo): VNode {
+  private renderLayerPerformanceInfoNode(performanceInfo: SceneViewPerformanceInfo, layerPerformanceInfo: LayerPerformanceInfo): VNode {
     const layerTypeMap = {
       "scene": "SceneLayer",
       "feature": "FeatureLayer",
@@ -345,16 +345,16 @@ export class ResourceInfo extends declared(Widget) {
     }
 
     return (
-      <tr key={`resource-info_layer_${layerResourceInfo.layer.id}`}>
-        <td>{layerTypeMap[layerResourceInfo.layer.type]}</td>
-        <td>{toScientificNotation(layerResourceInfo.memory)}</td>
+      <tr key={`performance-info_layer_${layerPerformanceInfo.layer.id}`}>
+        <td>{layerTypeMap[layerPerformanceInfo.layer.type]}</td>
+        <td>{toScientificNotation(layerPerformanceInfo.memory)}</td>
         <td>
           <div
           class="memoryIndicator"
-          key={`resource-info_layer_${layerResourceInfo.layer.id}_memoery`}>
+          key={`performance-info_layer_${layerPerformanceInfo.layer.id}_memory`}>
             <div
               class="memoryIndicatorValue"
-              style={`width: ${100 * layerResourceInfo.memory / resourceInfo.totalMemory}%`}
+              style={`width: ${100 * layerPerformanceInfo.memory / performanceInfo.totalMemory}%`}
             />
           </div>
         </td>
@@ -362,18 +362,18 @@ export class ResourceInfo extends declared(Widget) {
     );
   }
 
-  private renderMemoryBar(key: keyof SceneViewResourceInfo, resourceInfo: SceneViewResourceInfo): VNode {
-    if (key === "layerResourceInfo") {
+  private renderMemoryBar(key: keyof SceneViewPerformanceInfo, performanceInfo: SceneViewPerformanceInfo): VNode {
+    if (key === "layerPerformanceInfos") {
       return;
     }
 
     return (
       <div
         class="memoryIndicator"
-        key={`resource-info_root_${key}`}>
+        key={`performance-info_root_${key}`}>
         <div
           class="memoryIndicatorValue"
-          style={`width: ${100 * resourceInfo[key] / resourceInfo.totalMemory}%`}
+          style={`width: ${100 * performanceInfo[key] / performanceInfo.totalMemory}%`}
         />
       </div>
     );

@@ -1,7 +1,7 @@
 {
-  "name": "resource-info-demo",
+  "name": "performance-info-demo",
   "version": "1.0.0",
-  "description": "Resource info demo using the ArcGIS API for JavaScript",
+  "description": "Performance info demo using the ArcGIS API for JavaScript",
   "repository": {
     "type": "git",
     "url": "git@github.com:thother/devsummit-california-2020.git"

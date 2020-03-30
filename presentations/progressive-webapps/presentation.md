@@ -38,7 +38,7 @@
 - Elevation Alignment
 - Quality Profile
 - Environment
-- Resource Info
+- Performance Info
 - Demo
 
 ---
@@ -220,12 +220,12 @@ function play() {
 
 <!-- .slide: data-background="images/bg-2.png" -->
 
-## Resource Info
+## Performance Info
 
 SceneView exposes memory and load/quality information
 
 ```js
-SceneView.resourceInfo = {
+SceneView.performanceInfo = {
   // The total memory available in bytes.
   totalMemory: number;
 
@@ -245,7 +245,7 @@ SceneView.resourceInfo = {
   edgesMemory: number;
 
   // An array containing information about non-tiled layers.
-  layerResourceInfo: { layer: Layer; memory: number; ... }[];
+  layerPerformanceInfos: { layer: Layer; memory: number; ... }[];
 }
 ```
 

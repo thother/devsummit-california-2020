@@ -6,9 +6,9 @@ Learn about building mobile applications with the ArcGIS API for JavaScript that
 
 Focus is on working with the API and progressive web apps, best practices, and tips and tricks for improving application performance on mobile devices.
 
-Live: https://thother.github.io/devsummit-california-2020/presentations/progressive-webapps (contains 3d performance section only)
+Live: https://thother.github.io/devsummit-california-2020/presentations/progressive-webapps/ (contains 3d performance section only)
 
-Demo: https://thother.github.io/devsummit-california-2020/demos/performance-info
+Demo: https://thother.github.io/devsummit-california-2020/demos/performance-info/
 
 ## ArcGIS API for JavaScript: Fundamentals for Building 3D Web Apps 
 

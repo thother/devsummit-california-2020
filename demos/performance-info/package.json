@@ -21,7 +21,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "arcgis-js-api": "next",
-    "grunt": "^1.0.4",
+    "grunt": "^1.5.2",
     "grunt-contrib-concat": "*",
     "grunt-contrib-connect": "*",
     "grunt-contrib-copy": "*",
